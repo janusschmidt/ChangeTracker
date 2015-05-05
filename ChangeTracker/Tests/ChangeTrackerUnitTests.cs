@@ -10,9 +10,12 @@ namespace changeTracker.Tests
             var objToBeChanged = new Person { FName = "Anders", LName = "And" };
 
             var sut = new ChangeTracker<Person>(objToBeChanged);
-            sut.Set(o => o.FName, "Donald");
+            var hasBeenChanged = sut
+              .Set(o => o.FName, "Donald")
+              .Execute();
 
-            Assert.True(sut.HasBeenChanged);
+            Assert.True(hasBeenChanged);
+            Assert.Equal("Donald", objToBeChanged.FName);
         }
 
         [Fact]
@@ -21,9 +24,11 @@ namespace changeTracker.Tests
             var objToBeChanged = new Person { FName = "Anders", LName = "And" };
 
             var sut = new ChangeTracker<Person>(objToBeChanged);
-            sut.Set(o => o.FName, "Anders");
+            var hasBeenChanged = sut
+              .Set(o => o.FName, "Anders")
+              .Execute();
 
-            Assert.False(sut.HasBeenChanged);
+            Assert.False(hasBeenChanged);
         }
 
         [Fact]
@@ -32,10 +37,12 @@ namespace changeTracker.Tests
             var objToBeChanged = new Person { FName = "Anders", LName = "And" };
 
             var sut = new ChangeTracker<Person>(objToBeChanged);
-            sut.Set(o => o.FName, "Donald")
-                .Set(o => o.LName, "Duck");
+            var hasBeenChanged = sut
+              .Set(o => o.FName, "Donald")
+              .Set(o => o.LName, "Duck")
+              .Execute();
 
-            Assert.True(sut.HasBeenChanged);
+            Assert.True(hasBeenChanged);
         }
 
         [Fact]
@@ -45,9 +52,13 @@ namespace changeTracker.Tests
             var child = new Person { FName = "Rip", LName = "And" };
 
             var sut = new ChangeTracker<Person>(objToBeChanged);
-            sut.Set(o => o.Child, child);
+            var hasBeenChanged = sut
+              .Set(o => o.Child, child)
+              .Execute();
 
-            Assert.True(sut.HasBeenChanged);
+            Assert.True(hasBeenChanged);
+            Assert.Equal("Rip", objToBeChanged.Child.FName);
+            Assert.Equal("And", objToBeChanged.Child.LName);
         }
 
         [Fact]
@@ -59,9 +70,11 @@ namespace changeTracker.Tests
             objToBeChanged.Child = child1;
 
             var sut = new ChangeTracker<Person>(objToBeChanged);
-            sut.Set(o => o.Child, child2);
+            var hasBeenChanged = sut
+              .Set(o => o.Child, child2)
+              .Execute();
 
-            Assert.False(sut.HasBeenChanged);
+            Assert.False(hasBeenChanged);
         }
 
         [Fact]
@@ -70,11 +83,13 @@ namespace changeTracker.Tests
             var objToBeChanged = new Person { FName = "Anders", LName = "And" , Child = new Person { FName = "Rip", LName = "And" }};
             
             var sut = new ChangeTracker<Person>(objToBeChanged);
-            sut.Set(o => o.Child.LName, "duck");
+            var hasBeenChanged = sut
+              .Set(o => o.Child.LName, "duck")
+              .Execute();
 
-            Assert.True(sut.HasBeenChanged);
+            Assert.True(hasBeenChanged);
+            Assert.Equal("duck", objToBeChanged.Child.LName);
         }
-
 
         class Person
         {
@@ -94,8 +109,8 @@ namespace changeTracker.Tests
                 if (obj.GetType() != GetType()) return false;
                 return Equals((Person) obj);
             }
-            
-            protected bool Equals(Person other)
+
+            bool Equals(Person other)
             {
                 return string.Equals(FName, other.FName) && string.Equals(LName, other.LName) && Equals(Child, other.Child);
             }
