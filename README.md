@@ -21,16 +21,17 @@ namespace changeTracker
 
             //change everything you wan't to change via the changetracker
             var c = new ChangeTracker<Person>(l);
-            c
+            var hasBeenChanged = c
              .Set(i => i.Child.FName, "Rap")
-             .Set(i => i.LName, "Duck");
+             .Set(i => i.LName, "Duck")
              // etc. etc. (chaining not required)
+             .Execute();
 
-            Console.WriteLine(c.HasBeenChanged); //prints true
+            Console.WriteLine(hasBeenChanged); //prints true
 
             c.ResetHasBeenChanged();
-            c.Set(i => i.LName, "Duck"); //nochange!!
-            Console.WriteLine(c.HasBeenChanged); //prints false
+            hasBeenChanged = c.Set(i => i.LName, "Duck").Execute(); //nochange!!
+            Console.WriteLine(hasBeenChanged); //prints false
 
             Console.WriteLine("press key");
             Console.ReadKey();
